@@ -14,7 +14,7 @@ namespace magic.lambda.xml.tests
         public void FromXml()
         {
             var result = Common.Evaluate(@"
-html2lambda:@""<html>
+xml2lambda:@""<html>
   <head>
     <title>Foo</title>
   </head>
