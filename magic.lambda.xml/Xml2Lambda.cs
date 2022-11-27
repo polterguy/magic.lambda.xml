@@ -2,9 +2,9 @@
  * Magic Cloud, copyright Aista, Ltd. See the attached LICENSE file for details.
  */
 
-using System.Linq;
 using System.Web;
-using HtmlAgilityPack;
+using System.Xml;
+using System.Linq;
 using magic.node;
 using magic.node.extensions;
 using magic.signals.contracts;
@@ -12,7 +12,7 @@ using magic.signals.contracts;
 namespace magic.lambda.xml
 {
     /// <summary>
-    /// [xml2lambda] slot for transforming a piece of HTML to a lambda hierarchy.
+    /// [xml2lambda] slot for transforming a piece of XML to a lambda hierarchy.
     /// </summary>
     [Slot(Name = "xml2lambda")]
     public class Xml2Lambda : ISlot
@@ -24,50 +24,58 @@ namespace magic.lambda.xml
         /// <param name="input">Arguments to slot.</param>
         public void Signal(ISignaler signaler, Node input)
         {
+            // Getting XML content.
             var xml = input.GetEx<string>();
+
+            // House cleaning
             input.Value = null;
-            var doc = new HtmlDocument();
-            doc.LoadHtml(xml);
-            ParseXmlDocument(input, doc.DocumentNode);
+            input.Clear();
+
+            // Creating XML document by loading string content.
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
+
+            // Creating result node and adding as child to input node.
+            var result = new Node();
+            ParseXmlNode(result, doc.DocumentElement);
+            input.Add(result);
         }
 
         #region [ -- Private helper methods -- ]
 
-        static Xml2Lambda()
+        static void ParseXmlNode(Node resultNode, XmlNode xmlNode)
         {
-            // Making sure "form" element conforms to relational DOM structure
-            HtmlNode.ElementsFlags.Remove("form");
-        }
+            // Making sure we apply name of node.
+            resultNode.Name = xmlNode.Name;
 
-        static void ParseXmlDocument(Node resultNode, HtmlNode xmlNode)
-        {
-            // Skipping document node
-            if (xmlNode.Name != "#document")
+            // Checking if this is a simple "text node".
+            if (xmlNode.Name == "#text")
             {
-                // Adding all attributes
-                resultNode.AddRange(
-                    xmlNode.Attributes
-                        .Select(ix => new Node("@" + ix.Name, HttpUtility.HtmlDecode(ix.Value))));
-
-                // Then the name of HTML element
-                resultNode.Name = xmlNode.Name;
-                if (xmlNode.Name == "#text")
-                {
-                    // This is a "simple node", with no children, only HTML content
-                    resultNode.Value = HttpUtility.HtmlDecode(xmlNode.InnerText);
-                }
+                // This is a "simple node", with no children, only HTML content
+                resultNode.Value = HttpUtility.HtmlDecode(xmlNode.InnerText);
             }
-
-            // Then looping through each child HTML element
-            foreach (var idxChild in xmlNode.ChildNodes)
+            else
             {
-                // We don't add comments or empty elements
-                if (idxChild.Name != "#comment")
+                // Adding all attributes.
+                if (xmlNode.Attributes != null)
                 {
-                    if (idxChild.Name == "#text" && string.IsNullOrEmpty(idxChild.InnerText.Trim()))
-                        continue;
-                    resultNode.Add(new Node());
-                    ParseXmlDocument(resultNode.Children.Last(), idxChild);
+                    foreach (XmlAttribute idx in xmlNode.Attributes)
+                    {
+                        resultNode.Add(new Node("@" + idx.Name, HttpUtility.HtmlDecode(idx.Value)));
+                    }
+                }
+
+                // Then looping through each child HTML element
+                foreach (XmlNode idxChild in xmlNode.ChildNodes)
+                {
+                    // We don't add comments or empty elements
+                    if (idxChild.Name != "#comment")
+                    {
+                        if (idxChild.Name == "#text" && string.IsNullOrEmpty(idxChild.InnerText.Trim()))
+                            continue;
+                        resultNode.Add(new Node());
+                        ParseXmlNode(resultNode.Children.Last(), idxChild);
+                    }
                 }
             }
         }

@@ -3,18 +3,18 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>magic.lambda.html</PackageId>
+    <PackageId>magic.lambda.xml</PackageId>
     <Authors>Aista, Ltd</Authors>
     <Company>Aista, Ltd</Company>
     <Copyright>Aista, Ltd, info@aista.com</Copyright>
-    <Description>JSON helper slots for Magic to help you transform HTML to lambda. To use package go to https://polterguy.github.io</Description>
+    <Description>JSON helper slots for Magic to help you transform XML to lambda. To use package go to https://polterguy.github.io</Description>
     <PackageProjectUrl>https://aista.com</PackageProjectUrl>
     <PackOnBuild>true</PackOnBuild>
     <PackageVersion>14.5.1</PackageVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/polterguy/magic.lambda.html</RepositoryUrl>
-    <PackageTags>html, parsing, hyperlambda</PackageTags>
+    <RepositoryUrl>https://github.com/polterguy/magic.lambda.xml</RepositoryUrl>
+    <PackageTags>xml, parsing, hyperlambda</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -42,11 +42,10 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin/Release/netstandard2.0/magic.lambda.html.xml</DocumentationFile>
+    <DocumentationFile>bin/Release/netstandard2.0/magic.lambda.xml.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
     <PackageReference Include="magic.node.extensions" Version="14.5.1" />
     <PackageReference Include="magic.signals.contracts" Version="14.5.1" />
   </ItemGroup>
