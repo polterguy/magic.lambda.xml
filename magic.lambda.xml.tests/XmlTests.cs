@@ -33,7 +33,7 @@ xml2lambda:x:@.xml");
         [Fact]
         public void Roundtrip()
         {
-            Common.Evaluate(@"
+            var result = Common.Evaluate(@"
 .xml:@""<CATALOG>
   <PLANT>
     <COMMON a=""""qwertyuio"""">Bloodroot</COMMON>
@@ -51,6 +51,29 @@ if
       get-value:x:@.xml
    .lambda
       throw:Not matching");
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void Throws_01()
+        {
+            Assert.Throws<HyperlambdaException>(() => {
+            Common.Evaluate(@"
+.xml:@""<CATALOG></CATALOG>""
+xml2lambda:x:@.xml
+lambda2xml:x:-
+   foo:bar");
+            });
+        }
+
+        [Fact]
+        public void Chldren_01()
+        {
+            var result = Common.Evaluate(@"
+lambda2xml
+   foo
+      #text:bar");
+            Assert.Equal("<foo>bar</foo>", new Expression("**/lambda2xml").Evaluate(result).First().Value);
         }
     }
 }

@@ -52,6 +52,9 @@ namespace magic.lambda.xml
                     }
                 }
             }
+
+            // House cleaning
+            input.Clear();
         }
 
         #region [ -- Private helper methods -- ]
